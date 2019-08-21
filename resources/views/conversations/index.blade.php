@@ -1,7 +1,9 @@
-<div class="col-md-3">
-    <div class="list-group">
-        @foreach ($users as $user)
-    <a href="{{ route('conversations.show', $user->id)}}" class="list-group-item">{{ $user->name }}</a>
-        @endforeach
-    </div>
+@extends('layouts.app')
+
+@section('content')
+<div class="container">
+    @include('conversations.users', ['users' => $users])
 </div>
+
+
+@endsection
