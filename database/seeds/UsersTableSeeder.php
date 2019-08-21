@@ -13,7 +13,7 @@ class UsersTableSeeder extends Seeder
     public function run()
     {
         for ($i = 0; $i < 10; $i++) {
-            Facade\DB::table('users')->insert([
+            \Illuminate\Support\Facades\DB::table('users')->insert([
                 'name' => "UtilisateurNum$i",
                 "email" => "utilisateur$i@email.com",
                 "password" => bcrypt('0000')
