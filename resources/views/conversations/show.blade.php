@@ -8,7 +8,13 @@
             <div class="card">
                 <div class="card-header">{{ $user->name }}</div>
                 <div class="card-body conversations">
-
+                    <form action="" method="POST">
+                        {{ csrf_field() }}
+                        <div class="form-group">
+                            <textarea name="content" placeholder="Ecrivez votre message" class="form-control"></textarea>
+                        </div>
+                        <button class=" btn btn-primary" type="submit">Envoyer</button>
+                    </form>
                 </div>
             </div>
         </div>

@@ -33,7 +33,18 @@ class ConversationsController extends Controller
     {
         return view('conversations/show', [
             'users' => $this->repo->getConversations($this->authman->user()->id),
-            'user' => $user
+            'user' => $user,
+            'message' => $this->repoo->getMessagFor($this->authman->user()->id, $user->id)
         ]);
+    }
+
+    public function store(User $user, Request $request)
+    {
+        $this->repo->createMessage(
+            $request->get('content'),
+            $this->authman->user()->id,
+            $user->id
+        );
+        return redirect(route('conversations.show', ['id' => $user->id]));
     }
 }
