@@ -10,10 +10,10 @@
                 <div class="card-body conversations">
                     @foreach($messages as $message)
                     <div class="row">
-                        <div class="col-md-10">
+                    <div class="col-md-10 {{ $message->from->id !== $user->id ? 'offset-md-2 text-right' : '' }}">
                             <p>
                                 <strong>
-                                    {{ $message->from->name }}
+                                    {{ $message->from->id !== $user->id ? 'Moi' : $message->from->name }}
                                 </strong>
                                 <br>
                                 {{ $message->content }}
