@@ -8,15 +8,15 @@
             <div class="card">
                 <div class="card-header">{{ $user->name }}</div>
                 <div class="card-body conversations">
-                    @foreach ($messages as $message)
+                    @foreach($messages as $message)
                     <div class="row">
                         <div class="col-md-10">
                             <p>
                                 <strong>
                                     {{ $message->from->name }}
                                 </strong>
-                            <br>
-                            {{ $message->content }}
+                                <br>
+                                {{ $message->content }}
                             </p>
                         </div>
                     </div>

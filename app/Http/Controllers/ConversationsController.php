@@ -16,25 +16,25 @@ class ConversationsController extends Controller
      */
     private $repo;
 
-    public function __construct(ConversationRepository $conversationRepository, AuthManager $authman)
+    public function __construct(ConversationRepository $conversationRepository, AuthManager $auth)
     {
         $this->repo = $conversationRepository;
-        $this->authman = $authman;
+        $this->auth = $auth;
     }
 
     public function index()
     {
         return view('conversations/index', [
-            'users' => $this->repo->getConversations($this->authman->user()->id)
+            'users' => $this->repo->getConversations($this->auth->user()->id)
         ]);
     }
 
     public function show(User $user)
     {
         return view('conversations/show', [
-            'users' => $this->repo->getConversations($this->authman->user()->id),
+            'users' => $this->repo->getConversations($this->auth->user()->id),
             'user' => $user,
-            'message' => $this->repo->getMessagesFor($this->authman->user()->id, $user->id)->get()
+            'messages' => $this->repo->getMessagesFor($this->auth->user()->id, $user->id)->get()
         ]);
     }
 
@@ -42,7 +42,7 @@ class ConversationsController extends Controller
     {
         $this->repo->createMessage(
             $request->get('content'),
-            $this->authman->user()->id,
+            $this->auth->user()->id,
             $user->id
         );
         return redirect(route('conversations.show', ['id' => $user->id]));
