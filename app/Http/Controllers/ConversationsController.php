@@ -34,10 +34,7 @@ class ConversationsController extends Controller
 
     public function index()
     {
-        return view('conversations/index', [
-            'users' => $this->repo->getConversations($this->auth->user()->id),
-            'unread' => $this->repo->unreadCount($this->auth->user()->id)
-        ]);
+        return view('conversations/index');
     }
 
     public function show(User $user)

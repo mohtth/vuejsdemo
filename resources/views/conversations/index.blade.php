@@ -2,8 +2,8 @@
 
 @section('content')
 
-<div class="container">
-    @include('conversations.users', ['users' => $users, 'unread' => $unread])
-</div>
+    <div id="messagerie">
+        <Messagerie :user="{{ Auth::user()->id }}"></Messagerie>
+    </div>
 
 @endsection
