@@ -3,14 +3,15 @@ import Vue from 'vue'
 
 Vue.use(Vuex)
 
-const get = function (url) {
-    fetch('/api/user', {
+const get = async function (url) {
+    let response = await fetch(url, {
         credentials: 'same-origin',
         headers: {
             'X-Requested-With': 'XMLHttpRequest',
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
         }
     })
+    debugger
 }
 
 /**
@@ -38,8 +39,8 @@ export default new Vuex.Store({
     },
 
     actions: {
-        loadConversations: function (context) {
-            get('/api/conversations')
+        loadConversations: async function (context) {
+            await get('/api/conversations')
         }
     }
 
