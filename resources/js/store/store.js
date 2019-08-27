@@ -3,13 +3,14 @@ import Vue from 'vue'
 
 Vue.use(Vuex)
 
-const get = async function (url) {
+const fetchApi = async function (url, options = {}) {
     let response = await fetch(url, {
         credentials: 'same-origin',
         headers: {
             'X-Requested-With': 'XMLHttpRequest',
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        }
+        },
+        ...options
     })
     if (response.ok) {
         return response.json()
@@ -39,33 +40,73 @@ const get = async function (url) {
 export default new Vuex.Store({
     strict: true,
     state: {
-        conversations: {
-        },
+        user: null,
+        conversations: {}
     },
     getters: {
-        conversations: function(state) {
+        user: function (state) {
+            return state.user
+        },
+
+        conversations: function (state) {
             return state.conversations
+        },
+
+        conversation: function (state) {
+            return function (id) {
+                return state.conversations[id] || {}              
+            }
+        },
+
+        messages: function (state){
+            return function (id) {
+                let conversation = state.conversations[id]
+                if (conversation && conversation.messages) {
+                    return conversation.messages
+                }else{
+                    return []
+                }
+            }
         }
     },
     mutations: {
+        setUser: function (state, userId) {
+            state.user = userId
+        },
         addConversations: function (state, {conversations}) {
-            let obj = {}
-            conversations.forEach(function (conversation){
-                obj[conversation.id] = conversation
+            conversations.forEach(function (c){
+                let conversation = state.conversations[c.id] || {}
+                conversation = {...conversation, ...c}
+                state.conversations = {...state.conversations, ...{[c.id]: conversation}}
             })
-            state.conversations = obj
+        },
+        addMessages: function (state, {messages, id}) {
+            let conversation = state.conversations[id] || {}
+            conversation.messages = messages
+            conversation.loaded = true
+            state.conversations = {...state.conversations, ...{[id]: conversation}}
         }
     },
 
     actions: {
         loadConversations: async function (context) {
-            let response = await get('/api/conversations')
-            context.commit('addConversations', {conversations:  response.conversations})
+            let response = await fetchApi('/api/conversations')
+            context.commit('addConversations', {conversations: response.conversations})
         },
         loadMessages: async function (context, conversationId) {
-            let response = await get('/api/conversations' + conversationId)
-            context.commit('addMessages', {messages: response.messages})
-
+            if (!context.getters.conversation(conversationId).loaded) {
+                let response = await fetchApi('/api/conversations/' + conversationId)
+                context.commit('addMessages', {messages: response.messages, id: conversationId})    
+            }
+        },
+        sendMessage: async function (context, {content, userId}) {
+            await fetchApi('/api/conversations', {
+                method: 'POST',
+                body: JSON.stringify({
+                    content: content, 
+                    to_id: userId
+                })
+            })
         }
     }
 })

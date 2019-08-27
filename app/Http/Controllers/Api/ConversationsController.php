@@ -7,6 +7,7 @@ use App\Repository\ConversationRepository;
 use App\User;
 use Illuminate\Http\Request;
 
+
 class ConversationsController extends Controller
 {
     /**
@@ -32,7 +33,7 @@ class ConversationsController extends Controller
 
     public function show(Request $request, User $user)
     {
-        $messages = $this->conversationRepository->getMessagesFor($request->user->id, $user->id)->get();
+        $messages = $this->conversationRepository->getMessagesFor($request->user()->id, $user->id)->get();
         return [
             'messages' => $messages->reverse()
         ];

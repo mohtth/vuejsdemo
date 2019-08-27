@@ -3,22 +3,19 @@
         <div class="col-md-3">
             <div class="list-group">
                 <template v-for="conversation in conversations">
-                    <router-link :to="{name: 'conversation', params: {id: conversation.id}}" class="list-group-item d-flex justify-content-between align-items-center">
+                    <divrouter-link :to="{name: 'conversation', params: {id: conversation.id}}" class="list-group-item d-flex justify-content-between align-items-center">
                         {{conversation.name }}
                         <span class="badge badge-pill badge-primary" v-if="conversation.unread">
                                 {{conversation.unread}}
                         </span>
-                    </router-link>
+                    </divrouter-link>
                 </template>
             </div>
         </div>
 
         <div class="col-md-9">
-            <router-view>
-
-            </router-view>
+            <router-view></router-view>
         </div>
-
 
     </div>
 </template>
@@ -34,6 +31,7 @@
         },
         mounted() {
             this.$store.dispatch('loadConversations')
+            this.$store.commit('setUser', this.user)
         }
     }
 </script>
