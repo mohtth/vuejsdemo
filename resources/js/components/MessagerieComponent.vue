@@ -2,14 +2,15 @@
     <div class="row">
         <div class="col-md-3">
             <div class="list-group">
-                <a class="list-group-item d-flex justify-content-between align-items-center">
-                    UtilisateurNum  {{ user }}
-                    <span class="badge badge-pill badge-primary">
-                            0
-                    </span>
-                </a>
+                <template v-for="conversation in conversations">
+                    <a class="list-group-item d-flex justify-content-between align-items-center">
+                        {{conversation.name }}
+                        <span class="badge badge-pill badge-primary" v-if="conversation.unread">
+                                {{conversation.unread}}
+                        </span>
+                    </a>
+                </template>
             </div>
-            {{ conversations }}
         </div>
     </div>
 </template>
