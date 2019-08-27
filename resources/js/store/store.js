@@ -11,7 +11,12 @@ const get = async function (url) {
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
         }
     })
-    debugger
+    if (response.ok) {
+        return response.json()
+    } else {
+        let error = await response.json()
+        throw new Error(error.message)
+    }
 }
 
 /**
@@ -37,11 +42,25 @@ export default new Vuex.Store({
         conversations: {
         },
     },
+    getters: {
+        conversations: function(state) {
+            return state.conversations
+        }
+    },
+    mutations: {
+        addMessages: function (state, {conversations}) {
+            let obj = {}
+            conversations.forEach(function (conversation){
+                obj[conversation.id] = conversation
+            })
+            state.conversations = obj
+        }
+    },
 
     actions: {
         loadConversations: async function (context) {
-            await get('/api/conversations')
+            let response = await get('/api/conversations')
+            context.commit('addMessages', {conversations:  response.conversations})
         }
     }
-
 })

@@ -9,14 +9,19 @@
                     </span>
                 </a>
             </div>
+            {{ conversations }}
         </div>
     </div>
 </template>
 
 <script>
+    import {mapGetters} from 'vuex'
     export default {
         props: {
             user: Number
+        },
+        computed: {
+            ...mapGetters(['conversations'])
         },
         mounted() {
             this.$store.dispatch('loadConversations')
