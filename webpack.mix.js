@@ -1,4 +1,4 @@
-const mix = require('laravel-mix');
+let mix = require('laravel-mix');
 
 /*
  |--------------------------------------------------------------------------
@@ -11,6 +11,22 @@ const mix = require('laravel-mix');
  |
  */
 
+
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+const webpack = require('webpack')
+
+
 mix
     .js('resources/js/app.js', 'public/js')
-    .sass('resources/sass/app.scss', 'public/css');
+    .sass('resources/sass/app.scss', 'public/css')
+
+/*minute 1:53:35 grafikart*/
+
+    .webpackConfig({
+        plugins: [
+            new webpack.ContextReplacementPlugin(/moment[\/\\]locale$, /fr),
+            new BundleAnalyzerPlugin({
+                open: false
+            })
+        ]
+    })

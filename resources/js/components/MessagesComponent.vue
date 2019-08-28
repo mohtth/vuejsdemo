@@ -1,62 +1,120 @@
 <template>
-    <div class="card">
-        <div class="card-header"> Utilisateur</div>
-        <div class="card-body">
-            <Message :message="message" v-for="message in messages" :user="user"/>
-        </div>
-    </div>
-
-
-    <form action="" method="POST">
+  <div class="card">
+    <div class="card-header">{{ name }}</div>
+    <div class="card-body messagerie__body">
+      <Message :message="message" :key="message.id" v-for="message in messages" :user="user" />
+      <form action method="POST">
         <div class="form-group">
-            <textarea name="content" v-model="content" placeholder="Ecrivez votre message" class="form-control" @keypress.enter="sendMessage"></textarea>
-            <div class="invalid-feedback">
-                Une erreur
-            </div>
+          <textarea
+            name="content"
+            v-model="content"
+            placeholder="Ecrivez votre message"
+            :class="{'form-control': true, 'is-invalid': errors['content']}"
+            @keypress.enter="sendMessage"
+          ></textarea>
+          <div class="invalid-feedback" v-if="errors['content']">{{ errors['content'].join(', ')}}</div>
         </div>
-    </form>
-
-
+      </form>
+      <div class="messagerie__loading" v-if="loading">
+        <div class="loader"></div>
+      </div>
+    </div>
+  </div>
 </template>
 
 
 <script>
-import Message from './MessageComponent'
-import {mapGetters} from 'vuex'
+import Message from "./MessageComponent";
+import { mapGetters } from "vuex";
 
 export default {
-    components: {Message},
-    data() {
-        return {
-            content: ''
-        }
+  components: { Message },
+  data() {
+    return {
+      content: "",
+      errors: {},
+      loading: false
+    };
+  },
+  computed: {
+    ...mapGetters(["user"]),
+    messages: function() {
+      return this.$store.getters.messages(this.$route.params.id);
     },
-    computed: {
-        ...mapGetters(['user']),
-        messages: function() {
-            return this.$store.getters.messages(this.$route.params.id)
-        }
+    name: function() {
+      return this.$store.getters.conversation(this.$route.params.id).name;
     },
-    mounted (){
-        this.$store.dispatch('loadMessages', this.$route.params.id)
-    },
-    watch: {
-        '$route.params.id': function () {
-            this.loadMessages()
-        }
-    },
-    methods: {
-        loadMessages () {
-            this.$store.dispatch('loadMessages', this.$route.params.id)
-        },
-        sendMessage (e) {
-            if (e.shiftKey === false) {
-                this.$store.dispatch('sendMessage', {
-                    content: this.content, 
-                    userId: $route.params.id,
-                })
-            }
-        }
+    count: function() {
+      return this.$store.getters.conversation(this.$route.params.id).count;
     }
-}
+  },
+  mounted() {
+    this.loadMessages();
+    this.$messages = this.$el.querySelector(".messagerie__body");
+  },
+  destroyed() {},
+  watch: {
+    "$route.params.id": function() {
+      this.loadMessages();
+    }
+  },
+  methods: {
+    async loadMessages() {
+      let response = await this.$store.dispatch(
+        "loadMessages",
+        this.$route.params.id
+      );
+      this.scrollBot();
+      if (this.messages.length < this.count) {
+        this.$messages.addEventListener("scroll", this.onScroll);
+      }
+    },
+    async onScroll() {
+      if (this.$messages.scrollTop === 0) {
+        this.loading = true;
+        this.$messages.removeEventListener("scroll", this.onScroll);
+        let previousHeight = this.$messages.scrollHeight;
+        await this.$store.dispatch(
+          "loadPreviousMessages",
+          this.$route.params.id
+        );
+        this.$nextTick(() => {
+          this.$messages.scrollTop =
+            this.$messages.scrollHeight - previousHeight;
+        });
+        if (this.messages.length < this.count) {
+          this.$messages.addEventListener("scroll", this.onScroll);
+        }
+        this.loading = false;
+      }
+    },
+    scrollBot() {
+      this.$nextTick(() => {
+        this.$messages.scrollTop = $messages.scrollHeight;
+      });
+    },
+    async sendMessage(e) {
+      if (e.shiftKey === false) {
+        this.loading = true;
+        this.errors = {};
+        e.preventDefault();
+        try {
+          await this.$store.dispatch("sendMessage", {
+            content: this.content,
+            userId: this.$route.params.id
+          });
+          this.content = "";
+          this.scrollBot();
+        } catch (e) {
+          if (e.errors) {
+            this.errors = e.errors;
+          } else {
+            console.error(e);
+          }
+        }
+        this.loading = false;
+      }
+    }
+  }
+};
 </script>

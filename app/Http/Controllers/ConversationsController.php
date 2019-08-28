@@ -54,15 +54,4 @@ class ConversationsController extends Controller
             'unread' => $unread
         ]);
     }
-
-    public function store(User $user, StoreMessageRequest $request)
-    {
-        $message = $this->repo->createMessage(
-            $request->get('content'),
-            $this->auth->user()->id,
-            $user->id
-        );
-        $user->notify(new MessageReceived($message));
-        return redirect(route('conversations.show', ['id' => $user->id]));
-    }
 }

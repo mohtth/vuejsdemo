@@ -8,11 +8,16 @@ Vue.use(VueRouter)
 
 let $messagerie = document.querySelector('#messagerie')
 
-if ($messagerie){
+if ($messagerie) {
 
-    const routes = [
-        {path: '/'},
-        {path: '/:id', component: MessagesComponent, name: 'conversation'}
+    const routes = [{
+            path: '/'
+        },
+        {
+            path: '/:id',
+            component: MessagesComponent,
+            name: 'conversation'
+        }
     ]
 
     const router = new VueRouter({
@@ -23,7 +28,9 @@ if ($messagerie){
 
     new Vue({
         el: '#messagerie',
-        components: { Messagerie },
+        components: {
+            Messagerie
+        },
         store,
         router
     })
