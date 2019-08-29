@@ -24,7 +24,7 @@ mix
 
     .webpackConfig({
         plugins: [
-            new webpack.ContextReplacementPlugin(/moment[\/\\]locale$, /fr),
+            new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /fr/),
             new BundleAnalyzerPlugin({
                 open: false
             })

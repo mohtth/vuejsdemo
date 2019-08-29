@@ -3,7 +3,7 @@
     <div class="col-md-3">
       <div class="list-group">
         <template v-for="conversation in conversations">
-          <router-link :key="conversation" :to="{name: 'conversation', params: {id: conversation.id}}"
+          <router-link :to="{name: 'conversation', params: {id: conversation.id}}"
             class="list-group-item d-flex justify-content-between align-items-center">
             {{conversation.name }}
             <span class="badge badge-pill badge-primary" v-if="conversation.unread">{{conversation.unread}}</span>

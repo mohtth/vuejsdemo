@@ -2,29 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreMessageRequest;
-use App\Notifications\MessageReceived;
 use App\User;
-use App\Repository\ConversationRepository;
-use Illuminate\Auth\AuthManager;
-use Illuminate\Foundation\Auth\User as IlluminateUser;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Auth\AuthManager;
+use App\Notifications\MessageReceived;
+use App\Http\Requests\StoreMessageRequest;
+use App\Repository\ConversationRepository;
+
+
 
 class ConversationsController extends Controller
 {
 
-    /**
-     * @var ConversationRepository
-     */
     private $repo;
+    private $auth;
 
     /**
      *
-     * @var AuthManager
+     * @param ConversationRepository $conversationRepository
+     * @param AuthManager $auth
      */
-    private $auth;
-
     public function __construct(ConversationRepository $conversationRepository, AuthManager $auth)
     {
         $this->middleware('auth');
@@ -32,16 +29,27 @@ class ConversationsController extends Controller
         $this->auth = $auth;
     }
 
+    /**
+     *
+     * @return void
+     */
     public function index()
     {
         return view('conversations/index');
     }
 
+    /**
+     *
+     * @param User $user
+     * @return void
+     *
+     */
     public function show(User $user)
     {
         $me = $this->auth->user();
         $messages = $this->repo->getMessagesFor($me->id, $user->id)->paginate(6);
         $unread = $this->repo->unreadCount($me->id);
+
         if (isset($unread[$user->id])) {
             $this->repo->readAllFrom($user->id, $me->id);
             unset($unread[$user->id]);
@@ -53,5 +61,24 @@ class ConversationsController extends Controller
             'messages' => $messages,
             'unread' => $unread
         ]);
+    }
+
+    /**
+     *
+     *
+     * @param User $user
+     * @param StoreMessageRequest $request
+     * @return void
+     */
+    public function store(User $user, StoreMessageRequest $request)
+    {
+        $message = $this->conversationRepository->createMessage(
+            $request->get('content'),
+            $request->user()->id,
+            $user->id
+        );
+        return [
+            'message'->$message
+        ];
     }
 }
